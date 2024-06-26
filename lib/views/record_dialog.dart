@@ -1,4 +1,7 @@
+// import 'dart:ffi';
+// import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:robo9_mobile_app/Service/Bloc/ros_bloc.dart';
 import 'package:robo9_mobile_app/Service/Bloc/ros_event.dart';
@@ -50,6 +53,7 @@ class _RecordDialogState extends State<RecordDialog> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
+                style: ElevatedButton.styleFrom(fixedSize: const Size(130, 40)),
                 onPressed: () async {
                   // 保存文件的逻辑
                   if (_filename.text == '') {
@@ -66,10 +70,18 @@ class _RecordDialogState extends State<RecordDialog> {
                     context
                         .read<RosBloc>()
                         .add(RosPublishEvent(topic, datatype, json));
+
                     await Future.delayed(const Duration(milliseconds: 500));
                     setState(() {
                       if (_feedback == 0) {
                         _isSaved = true;
+                        int data = 1;
+                        Map<String, dynamic> json_file = {"data": data};
+
+                        context.read<RosBloc>().add(RosPublishEvent(
+                            'app_com/file_list_request',
+                            'std_msgs/Int8',
+                            json_file));
                       } else {
                         _isSaved = false;
                       }
@@ -99,10 +111,12 @@ class _RecordDialogState extends State<RecordDialog> {
             ],
           ),
           if (_isSaved)
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
+                  style:
+                      ElevatedButton.styleFrom(fixedSize: const Size(130, 40)),
                   onPressed: () {
                     // 返回 true 并关闭对话框
                     bool data = true;
@@ -115,6 +129,8 @@ class _RecordDialogState extends State<RecordDialog> {
                   child: const Text('Save Initial'),
                 ),
                 ElevatedButton(
+                  style:
+                      ElevatedButton.styleFrom(fixedSize: const Size(130, 40)),
                   onPressed: () {
                     // 返回 true 并关闭对话框
                     context.read<RosBloc>().add(RosSetParamEvent(
@@ -129,10 +145,13 @@ class _RecordDialogState extends State<RecordDialog> {
                   child: const Text('Start Record'),
                 ),
               ],
-            ),
+            )
+                .animate()
+                .fadeIn()
+                .slideY(begin: 0.5, end: 0, curve: Curves.decelerate),
         ],
       ),
-    );
+    ).animate().fadeIn(curve: Curves.easeIn).scale(curve: Curves.easeInOutExpo);
   }
 }
 
@@ -224,6 +243,6 @@ class _SaveDialogState extends State<SaveDialog> {
           child: const Text('OK'),
         ),
       ],
-    );
+    ).animate().fadeIn(curve: Curves.easeIn).scale(curve: Curves.easeInOutExpo);
   }
 }

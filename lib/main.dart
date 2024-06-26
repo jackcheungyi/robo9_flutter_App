@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:robo9_mobile_app/Service/Bloc/ros_bloc.dart';
 import 'package:robo9_mobile_app/Service/Bloc/ros_event.dart';
@@ -46,7 +47,10 @@ class HomePage extends StatelessWidget {
         // return const Dashboard();
       } else if (state is RosStateConnected) {
         // print("returning controll page");
-        return const Dashboard();
+        return const Dashboard()
+            .animate()
+            .fade()
+            .scale(curve: Curves.decelerate);
       } else {
         return const Scaffold(
           body: CircularProgressIndicator(),

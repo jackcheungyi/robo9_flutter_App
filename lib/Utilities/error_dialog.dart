@@ -10,7 +10,7 @@ Future<void> showErrorDialog(
     title: 'ERROR',
     content: text,
     optionsBuilder: () => {
-      'OK': null,
+      'OK': DialogOption(title: 'OK', color: Colors.black, value: null),
     },
   );
 }

@@ -43,6 +43,8 @@ dependencies:
   flutter_joystick: ^0.0.4
   cupertino_battery_indicator: ^1.1.0
   file_picker: ^5.2.5
+  flutter_animate: ^4.5.0
+  flutter_native_splash: ^2.3.11
 
 dev_dependencies:
   flutter_test:
@@ -96,3 +98,14 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_native_splash:
+  android: true
+  ios: true 
+  web: false
+  color: "#FFFFFF"
+  image: "assets/logo.png"
+  android_12:
+    image: "assets/logo.png"
+    icon_background_color: "#ffffff"
+    color_dark: "#121212"
+    image_dark: "assets/logodark.png"

@@ -43,7 +43,12 @@ class RosProvider {
         });
         // print("Trying to connect");
         _ros!.connect();
-        Timer(const Duration(seconds: 1), () async {
+        Timer(const Duration(seconds: 5), () {
+          if (!completer.isCompleted) {
+            completer.completeError(RosConnectionException());
+          }
+        });
+        Timer(const Duration(seconds: 2), () async {
           // print("inside timer");
           // print(localState.toString());
           Topic chatter = Topic(

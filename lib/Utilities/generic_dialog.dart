@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-typedef DialogOptionBuilder<T> = Map<String, T?> Function();
+class DialogOption {
+  final String title;
+  final Color color;
+  final dynamic value;
+  DialogOption({required this.title, required this.color, required this.value});
+}
+
+typedef DialogOptionBuilder<T> = Map<String, DialogOption> Function();
 
 Future<T?> showGenericDialog<T>({
   required BuildContext context,
@@ -16,7 +24,7 @@ Future<T?> showGenericDialog<T>({
         title: Text(title),
         content: Text(content),
         actions: options.keys.map((optionTitle) {
-          final value = options[optionTitle];
+          final value = options[optionTitle]?.value;
           return TextButton(
             onPressed: () {
               if (value != null) {
@@ -25,10 +33,14 @@ Future<T?> showGenericDialog<T>({
                 Navigator.of(context).pop();
               }
             },
-            child: Text(optionTitle),
+            child: Text(
+              optionTitle,
+              style: TextStyle(color: options[optionTitle]!.color),
+            ),
           );
         }).toList(),
-      );
+      ).animate().fadeIn(curve: Curves.easeIn).scale(
+          curve: Curves.easeInOutExpo); // runs after the above w/new duration
     },
   );
 }

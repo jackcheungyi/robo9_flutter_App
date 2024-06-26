@@ -7,8 +7,8 @@ Future<bool> showDisconnectDialog(BuildContext context) {
     title: 'Disconnect',
     content: 'Are you sure to disconnect?',
     optionsBuilder: () => {
-      'No': false,
-      'Yes': true,
+      'No': DialogOption(title: 'No', color: Colors.red, value: false),
+      'Yes': DialogOption(title: 'Yes', color: Colors.blue, value: true),
     },
   ).then(
     (value) => value ?? false,

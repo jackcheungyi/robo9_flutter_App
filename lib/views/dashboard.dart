@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
@@ -11,6 +12,7 @@ import 'package:robo9_mobile_app/Utilities/Joystick.dart';
 import 'package:cupertino_battery_indicator/cupertino_battery_indicator.dart';
 import 'package:robo9_mobile_app/Utilities/disconnect_dialog.dart';
 import 'package:robo9_mobile_app/Utilities/error_dialog.dart';
+import 'package:robo9_mobile_app/Utilities/file_dialog.dart';
 import 'package:robo9_mobile_app/views/record_dialog.dart';
 
 enum MenuAction { Disconnect }
@@ -33,16 +35,26 @@ class _DashboardState extends State<Dashboard> {
   bool _isSliderEnabled = true;
   List<bool> _isSelected = [true, false];
   bool _isPressed = false;
+  late String dropdownValue;
+  dynamic filenames;
   late final TextEditingController filenameText;
   late final TextEditingController maxSpeedText;
   late final TextEditingController humanWidthText;
   late final TextEditingController obstacleDistanceText;
   late final TextEditingController cameraobstacleDistanceText;
 
+  Future<void> fileListHandler(Map<String, dynamic> msg) async {
+    String data = msg['data'];
+    // print("fileListhandler called");
+    List<String> files = data.split(',');
+    files.removeLast();
+    filenames = files;
+  }
+
   Future<void> stopParamHandler(Map<String, dynamic> param) async {
     String data = param['value'];
     _isStop = data.toLowerCase() == 'true';
-    print("data receive from param system ${_isStop}");
+    // print("data receive from param system ${_isStop}");
     _isPressed = _isStop;
   }
 
@@ -59,7 +71,8 @@ class _DashboardState extends State<Dashboard> {
     String filename = msg['follow_path_file'].toString();
     List<String> file_str = filename.split('/');
     file_str = file_str.last.split('.');
-    filenameText.text = file_str[0];
+    // filenameText.text = file_str[0];
+    dropdownValue = file_str[0];
     humanWidthText.text = msg['human_width'].toString();
     _maxspeed = msg['max_speed'];
     _sliderValue = _maxspeed;
@@ -77,16 +90,31 @@ class _DashboardState extends State<Dashboard> {
     maxSpeedText = TextEditingController();
     obstacleDistanceText = TextEditingController();
     cameraobstacleDistanceText = TextEditingController();
-
+    // _filenames = <String>[
+    //   'File1_long',
+    //   'File2_very_long',
+    //   'File3',
+    //   'File4',
+    //   'File5'
+    // ];
     super.initState();
     int data = 1;
     Map<String, dynamic> json = {"data": data};
+
+    context.read<RosBloc>().add(
+        RosPublishEvent('app_com/file_list_request', 'std_msgs/Int8', json));
+
     context.read<RosBloc>().add(RosPublishEvent(
         'robot_system/setting_request', 'std_msgs/Int16', json));
+
     context.read<RosBloc>().add(
         RosSubsribeEvent(rosInfoHandler, '/robotinfo', 'robo9_msgs/RobotInfo'));
     context.read<RosBloc>().add(RosSubsribeEvent(
+        fileListHandler, '/app_com/file_list', 'std_msgs/String'));
+
+    context.read<RosBloc>().add(RosSubsribeEvent(
         rosSettingHandler, '/robot_system/setting', 'robo9_msgs/RobotSetting'));
+
     context
         .read<RosBloc>()
         .add(RosGetParamEvent('follow_path/emergency_stop', stopParamHandler));
@@ -112,20 +140,75 @@ class _DashboardState extends State<Dashboard> {
         return AlertDialog(
           title: const Text('Path Replay'),
           content: SingleChildScrollView(
-            child: Column(
+              child: StatefulBuilder(builder: (pcontest, StateSetter setState) {
+            return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
-                  controller: filenameText,
-                  decoration: const InputDecoration(
-                    labelText: 'File Load',
-                    hintText: 'Filename',
-                    hintStyle: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 14,
-                    ),
+                // TextField(
+                //   controller: filenameText,
+                //   decoration: const InputDecoration(
+                //     labelText: 'File Load',
+                //     hintText: 'Filename',
+                //     hintStyle: TextStyle(
+                //       color: Colors.grey,
+                //       fontSize: 14,
+                //     ),
+                //   ),
+                // ),
+                // DropdownMenu(
+                //   initialSelection: 'File1',
+                //   onSelected: (String? file){
+
+                //   },
+                //   dropdownMenuEntries:
+                //       _filenames.map<DropdownMenuEntry<String>>((String file) {
+                //     return DropdownMenuEntry(value: file, label: file);
+                //   }).toList(),
+                // ),
+                DropdownButton(
+                  value: dropdownValue,
+                  icon: const Icon(Icons.folder),
+                  isExpanded: true,
+                  menuMaxHeight: 250,
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  enableFeedback: true,
+                  hint: const Text('Please select a route file'),
+                  underline: Container(
+                    color: Colors.blue,
+                    height: 2,
                   ),
+                  onChanged: (String? file) async {
+                    if (file != dropdownValue) {
+                      int option = await showFileDialog(context, file!);
+                      if (option == 0) {
+                        dropdownValue = file;
+                      } else if (option == 1) {
+                        dropdownValue = dropdownValue;
+                      } else if (option == -1) {
+                        String topic = 'app_com/file_operation';
+                        String datatype = 'std_msgs/String';
+                        String msg = "0," + file;
+                        Map<String, dynamic> json = {"data": msg};
+                        context
+                            .read<RosBloc>()
+                            .add(RosPublishEvent(topic, datatype, json));
+                        filenames.remove(file);
+                        // dropdownValue = null;
+                        // dropdownValue = dropdownValue;
+                      }
+                      setState(() {
+                        print("Set State should call");
+
+                        // dropdownValue = file!;
+                        // dropdownValue = null;
+                      });
+                    }
+                  },
+                  items: filenames.map<DropdownMenuItem<String>>((String file) {
+                    return DropdownMenuItem(value: file, child: Text(file));
+                  }).toList(),
                 ),
+
                 TextField(
                   controller: maxSpeedText,
                   decoration: const InputDecoration(
@@ -159,8 +242,8 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
               ],
-            ),
-          ),
+            );
+          })),
           actions: [
             TextButton(
               onPressed: () {
@@ -172,8 +255,9 @@ class _DashboardState extends State<Dashboard> {
                     double.parse(obstacleDistanceText.text);
                 double cameraobstacledistance =
                     double.parse(cameraobstacleDistanceText.text);
-                String filename =
-                    "/opt/robo9/record_path/${filenameText.text}.txt";
+                // print("check dropdownvalue");
+                // print(dropdownValue);
+                String filename = "/opt/robo9/record_path/${dropdownValue}.txt";
                 double humanwidth = double.parse(humanWidthText.text);
 
                 var settingmsg = {
@@ -184,6 +268,9 @@ class _DashboardState extends State<Dashboard> {
                   'human_width': humanwidth
                 };
                 errormsg = _check_msg_vality(settingmsg);
+                if (dropdownValue == '') {
+                  errormsg = 'empty filename';
+                }
                 if (errormsg == "") {
                   /******** send param setting *********/
                   context.read<RosBloc>().add(const RosSetParamEvent(
@@ -215,8 +302,8 @@ class _DashboardState extends State<Dashboard> {
                   Map<String, dynamic> json = {"data": data};
                   context.read<RosBloc>().add(RosPublishEvent(
                       'robot_system/setting_request', 'std_msgs/Int16', json));
-                  context.read<RosBloc>().add(RosSubsribeEvent(
-                      rosInfoHandler, '/robotinfo', 'robo9_msgs/RobotInfo'));
+                  // context.read<RosBloc>().add(RosSubsribeEvent(
+                  //     rosInfoHandler, '/robotinfo', 'robo9_msgs/RobotInfo'));
                   Map<String, dynamic> cancel = {};
                   context.read<RosBloc>().add(RosPublishEvent(
                       '/move_base/cancel', 'actionlib_msgs/GoalID', cancel));
@@ -236,8 +323,9 @@ class _DashboardState extends State<Dashboard> {
                     double.parse(obstacleDistanceText.text);
                 double cameraobstacledistance =
                     double.parse(cameraobstacleDistanceText.text);
-                String filename =
-                    "/opt/robo9/record_path/${filenameText.text}.txt";
+                // print("check dropdownvalue");
+                // print(dropdownValue);
+                String filename = "/opt/robo9/record_path/${dropdownValue}.txt";
                 double humanwidth = double.parse(humanWidthText.text);
 
                 var settingmsg = {
@@ -249,7 +337,9 @@ class _DashboardState extends State<Dashboard> {
                 };
 
                 errormsg = _check_msg_vality(settingmsg);
-
+                if (dropdownValue == '') {
+                  errormsg = 'empty filename';
+                }
                 if (errormsg == "") {
                   print("enter block");
                   context.read<RosBloc>().add(const RosSetParamEvent(
@@ -302,7 +392,10 @@ class _DashboardState extends State<Dashboard> {
               child: const Text('Update'),
             ),
           ],
-        );
+        )
+            .animate()
+            .fadeIn(curve: Curves.easeIn)
+            .scale(curve: Curves.easeInOutExpo);
       },
     );
   }
@@ -395,7 +488,7 @@ class _DashboardState extends State<Dashboard> {
               child: const Text(
                 'Path Follow System',
                 style: TextStyle(
-                    fontSize: 25, // 设置字体大小
+                    fontSize: 20, // 设置字体大小
                     fontWeight: FontWeight.bold,
                     color: Colors.white),
               ),
@@ -593,6 +686,10 @@ class _DashboardState extends State<Dashboard> {
                             'robot_system/setting_request',
                             'std_msgs/Int16',
                             json));
+                        context.read<RosBloc>().add(RosPublishEvent(
+                            'app_com/file_list_request',
+                            'std_msgs/Int8',
+                            json));
                         !_isRecording ? _showReplayDialog(context) : {};
                       },
                       style: ElevatedButton.styleFrom(
@@ -676,12 +773,18 @@ class _DashboardState extends State<Dashboard> {
                     if (_isSliderEnabled) {
                       String topic = '/cmd_vel';
                       String datatype = 'geometry_msgs/Twist';
-                      var linear = {
-                        'x': -detail.y * _sliderValue,
-                        'y': 0.0,
-                        'z': 0.0
-                      };
-                      var angular = {'x': 0.0, 'y': 0.0, 'z': -detail.x * 0.75};
+                      // print("Y value : ${detail.y}");
+                      // print("X value : ${detail.x}");
+                      double y = detail.y;
+                      double x = detail.x;
+                      if (detail.y < 0.2 && detail.y > -0.2) {
+                        y = 0;
+                      }
+                      if (detail.y >= 0.2) {
+                        x = -x;
+                      }
+                      var linear = {'x': -y * _sliderValue, 'y': 0.0, 'z': 0.0};
+                      var angular = {'x': 0.0, 'y': 0.0, 'z': -x * 0.75};
                       var twist = {'linear': linear, 'angular': angular};
 
                       context
