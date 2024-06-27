@@ -1,20 +1,29 @@
-<<<<<<< HEAD
-# robo9_mobile_app
-=======
-# robo9_mobile_app
+<<<<<<< Brief Introduction>>>>>>>>
+Robo9 enhs phone application for teachers 
+=========================================
 
-A new Flutter project.
+Main Function >>>
+1.Remote control 
+2.Record follow path 
+3.Update robot setting 
+4.path file management 
 
-## Getting Started
+######### UI Demo ##########
+1.Connection Page 
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
->>>>>>> e15c7ec (app)
+
+2.DashBorad Page 
+
+
+
+
+
+
+
+
+
+
+########## Function Demo ##########
