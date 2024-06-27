@@ -366,6 +366,9 @@ class _DashboardState extends State<Dashboard> {
                   context.read<RosBloc>().add(RosPublishEvent(
                       '/robot_system/update_setting', datatype, settingmsg));
 
+                  Map<String, dynamic> cancel = {};
+                  context.read<RosBloc>().add(RosPublishEvent(
+                      '/move_base/cancel', 'actionlib_msgs/GoalID', cancel));
                   /*** trigger save file action ****/
 
                   //pending....
