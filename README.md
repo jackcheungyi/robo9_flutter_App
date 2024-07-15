@@ -1,5 +1,5 @@
 # Robo9 enhs phone application for teachers 
-* This is a mobile phone application developed using flutter, allowing user to establish connection with robot to control the robot and updating robot settings.
+* This is a mobile phone application developed using flutter, allowing user to establish connection with robot to control the robot and updating robot settings. A ros bloc was developed to manage the ros websocket api. 
 ## Main Function  
 * 1.Remote control 
 * 2.Record follow path 
