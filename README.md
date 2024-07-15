@@ -1,21 +1,27 @@
-<<<<<<< Brief Introduction>>>>>>>>\
-Robo9 enhs phone application for teachers 
-========================================
+# Robo9 enhs phone application for teachers 
+* This is a mobile phone application developed using flutter, allowing user to establish connection with robot to control the robot and updating robot settings.
+## Main Function  
+* 1.Remote control 
+* 2.Record follow path 
+* 3.Update robot setting 
+* 4.path file management 
 
-Main Function >>> \
-1.Remote control \
-2.Record follow path \
-3.Update robot setting \
-4.path file management 
-
-######### UI Demo ########## \
+## UI demo
 1.Connection Page
 
-![Screenshot 2024-07-02 111535](https://github.com/jackcheungyi/robo9_flutter_App/assets/26525435/270271cc-33bf-4bb6-ace7-de16cde18523)
+![connectpage](https://github.com/user-attachments/assets/2a42a1d9-815f-47f7-857e-bfbc29659dd3)
 
 2.DashBorad Page 
 
-![main](https://github.com/jackcheungyi/robo9_flutter_App/assets/26525435/41ee4646-6dad-40e4-b850-a6dbfc580099)
+![main_200](https://github.com/user-attachments/assets/f6d4013a-5405-4f07-9bfa-a9b01ab1ee7c)
+
+## Function demo
+* Connect to the host
+
+https://github.com/user-attachments/assets/8083e585-750f-4d02-8832-d699a582e520
 
 
-########## Function Demo ##########
+
+
+
+  
