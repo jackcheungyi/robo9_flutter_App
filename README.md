@@ -25,6 +25,11 @@ https://github.com/user-attachments/assets/6266dc5e-af68-465e-976d-927cec10e3cd
 
 https://github.com/user-attachments/assets/551c8b56-075b-4c21-95d1-b5f85351df0c
 
+* Disconnect from the host
 
+
+
+
+## Ros Bloc flow chart 
 
   
